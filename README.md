@@ -1,6 +1,6 @@
 # Inteligência Artificial - Projeto Picking
 
-Este é o Repositório do Projeto Jobby.
+Este é o Repositório do Projeto Picking.
 
 ## Git (WINDOWS)
 
