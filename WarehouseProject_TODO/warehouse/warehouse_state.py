@@ -11,7 +11,11 @@ class WarehouseState(State[Action]):
 
     def __init__(self, matrix: ndarray, rows, columns):
         super().__init__()
-        # TODO
+        # TODO (rever), falta contar o número de colisões talvez
+        self.line_forklift = None
+        self.column_forklift = None
+        self.line_exit = None
+        self.column_forklift = None
 
         self.rows = rows
         self.columns = columns
@@ -28,36 +32,61 @@ class WarehouseState(State[Action]):
                     self.column_exit = j
 
     def can_move_up(self) -> bool:
-        # TODO
-        pass
+        # TODO (rever)
+        return self.line_forklift != 0 and \
+            self.matrix[self.line_forklift - 1][self.column_forklift] != constants.SHELF and \
+            self.matrix[self.line_forklift - 1][self.column_forklift] != constants.PRODUCT and \
+            self.matrix[self.line_forklift - 1][self.column_forklift] != constants.PRODUCT_CATCH
 
     def can_move_right(self) -> bool:
-        # TODO
-        pass
+        # TODO (rever)
+        return self.column_forklift != self.columns - 1 and \
+            self.matrix[self.line_forklift][self.column_forklift + 1] != constants.SHELF and \
+            self.matrix[self.line_forklift][self.column_forklift + 1] != constants.PRODUCT and \
+            self.matrix[self.line_forklift][self.column_forklift + 1] != constants.PRODUCT_CATCH
 
     def can_move_down(self) -> bool:
-        # TODO
-        pass
+        # TODO (rever)
+        return self.line_forklift != self.rows - 1 and \
+            self.matrix[self.line_forklift + 1][self.column_forklift] != constants.SHELF and \
+            self.matrix[self.line_forklift + 1][self.column_forklift] != constants.PRODUCT and \
+            self.matrix[self.line_forklift + 1][self.column_forklift] != constants.PRODUCT_CATCH
 
     def can_move_left(self) -> bool:
-        # TODO
-        pass
+        # TODO (rever)
+        return self.column_forklift != 0 and \
+            self.matrix[self.line_forklift][self.column_forklift - 1] != constants.SHELF and \
+            self.matrix[self.line_forklift][self.column_forklift - 1] != constants.PRODUCT and \
+            self.matrix[self.line_forklift][self.column_forklift - 1] != constants.PRODUCT_CATCH
+
+    # In the next four methods we don't verify if the actions are valid.
+    # This is done in method getActions in class WarehouseProblemSearch.
+    # Doing the verification in these methods would imply that a clone of the
+    # state was created whether the operation could be executed or not.
 
     def move_up(self) -> None:
-        # TODO
-        pass
+        # TODO (rever)
+        self.matrix[self.line_forklift][self.column_forklift] = constants.EMPTY
+        self.line_forklift -= 1
+        self.matrix[self.line_forklift][self.column_forklift] = constants.FORKLIFT
 
     def move_right(self) -> None:
-        # TODO
-        pass
+        # TODO (rever)
+        self.matrix[self.line_forklift][self.column_forklift] = constants.EMPTY
+        self.column_forklift += 1
+        self.matrix[self.line_forklift][self.column_forklift] = constants.FORKLIFT
 
     def move_down(self) -> None:
-        # TODO
-        pass
+        # TODO (rever)
+        self.matrix[self.line_forklift][self.column_forklift] = constants.EMPTY
+        self.line_forklift += 1
+        self.matrix[self.line_forklift][self.column_forklift] = constants.FORKLIFT
 
     def move_left(self) -> None:
-        # TODO
-        pass
+        # TODO (rever)
+        self.matrix[self.line_forklift][self.column_forklift] = constants.EMPTY
+        self.column_forklift -= 1
+        self.matrix[self.line_forklift][self.column_forklift] = constants.FORKLIFT
 
     def get_cell_color(self, row: int, column: int) -> Color:
         if row == self.line_exit and column == self.column_exit and (
