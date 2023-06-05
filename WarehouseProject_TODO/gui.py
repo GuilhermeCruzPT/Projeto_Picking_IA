@@ -10,6 +10,7 @@ import queue
 import threading
 
 import constants
+from WarehouseProject_TODO.warehouse.warehouse_problemforSearch import WarehouseProblemSearch
 from ga.genetic_operators.mutation2 import Mutation2
 from ga.genetic_operators.mutation3 import Mutation3
 from ga.genetic_operators.recombination3 import Recombination3
@@ -618,11 +619,18 @@ class SearchSolver(threading.Thread):
         self.agent.stop()
 
     def run(self):
-        # TODO calculate pairs distances
+        # TODO calculate pairs distances (rever)
 
-        # for p in self.agents.pairs:
+        state = copy.deepcopy(self.agent.initial_environment)
+
         for p in self.agent.pairs:
-            p.value = abs(p.cell2.line - p.cell1.line) + abs(p.cell2.column - p.cell1.column)
+            state.line_forklift = p.cell1.line
+            state.column_forklift = p.cell1.column
+            state.line_exit = p.cell2.line
+            state.column_exit = p.cell2.column
+            problem = WarehouseProblemSearch(state, p.cell2)
+            sol = self.agent.solve_problem(problem)
+            p.value = sol.cost
 
         self.agent.search_method.stopped=True
         self.gui.problem_ga = WarehouseProblemGA(self.agent)
