@@ -624,13 +624,28 @@ class SearchSolver(threading.Thread):
         state = copy.deepcopy(self.agent.initial_environment)
 
         for p in self.agent.pairs:
+            # inicializar cell1 no WarehouseState
             state.line_forklift = p.cell1.line
             state.column_forklift = p.cell1.column
+            # inicializar cell2 no WarehouseState
             state.line_exit = p.cell2.line
             state.column_exit = p.cell2.column
+            # verificar se cell1 é produto
+            if p.cell1 in self.agent.products:
+                # verificar se pode mover para a direita
+                if state.can_move_right():
+                    # mover para a direita
+                    state.column_forklift += 1
+                # verificar se pode mover para a esquerda
+                elif state.can_move_left():
+                    # mover para a esquerda
+                    state.column_forklift -= 1
+
             problem = WarehouseProblemSearch(state, p.cell2)
             sol = self.agent.solve_problem(problem)
             p.value = sol.cost
+
+        self.gui.text_problem.insert(tk.END, str(self.agent))
 
         self.agent.search_method.stopped=True
         self.gui.problem_ga = WarehouseProblemGA(self.agent)

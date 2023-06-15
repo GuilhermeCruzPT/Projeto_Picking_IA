@@ -3,11 +3,20 @@ from abc import abstractmethod
 from ga.problem import Problem
 from ga.individual import Individual
 
+from WarehouseProject_TODO.ga.genetic_algorithm import GeneticAlgorithm
+
+
 class IntVectorIndividual(Individual):
 
     def __init__(self, problem: Problem, num_genes: int):
         super().__init__(problem, num_genes)
-        # TODO
+        # TODO (rever)
+        self.genome = np.full(num_genes, False, dtype=int)
+
+        for i in range(self.num_genes):
+            self.genome[i] = i + 1
+
+        GeneticAlgorithm.rand.shuffle(self.genome)
 
     def swap_genes(self, other, index: int):
         aux = self.genome[index]

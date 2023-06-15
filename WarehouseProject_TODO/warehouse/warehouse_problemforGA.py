@@ -11,8 +11,8 @@ class WarehouseProblemGA(Problem):
         self.agent_search = agent_search
 
     def generate_individual(self) -> "WarehouseIndividual":
-        # TODO
-        pass
+        # TODO (rever)
+        return WarehouseIndividual(self, len(self.products) + len(self.forklifts) - 1)
 
     def __str__(self):
         string = "# of forklifts: "
