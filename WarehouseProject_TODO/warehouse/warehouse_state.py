@@ -11,7 +11,7 @@ class WarehouseState(State[Action]):
 
     def __init__(self, matrix: ndarray, rows, columns):
         super().__init__()
-        # TODO (rever), falta contar o número de colisões talvez
+        # TODO (rever)
         self.line_forklift = None
         self.column_forklift = None
         self.line_exit = None

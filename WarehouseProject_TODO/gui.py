@@ -10,6 +10,7 @@ import queue
 import threading
 
 import constants
+from WarehouseProject_TODO.warehouse.cell import Cell
 from WarehouseProject_TODO.warehouse.warehouse_problemforSearch import WarehouseProblemSearch
 from ga.genetic_operators.mutation2 import Mutation2
 from ga.genetic_operators.mutation3 import Mutation3
@@ -624,26 +625,48 @@ class SearchSolver(threading.Thread):
         state = copy.deepcopy(self.agent.initial_environment)
 
         for p in self.agent.pairs:
-            # inicializar cell1 no WarehouseState
-            state.line_forklift = p.cell1.line
-            state.column_forklift = p.cell1.column
-            # inicializar cell2 no WarehouseState
-            state.line_exit = p.cell2.line
-            state.column_exit = p.cell2.column
-            # verificar se cell1 é produto
-            if p.cell1 in self.agent.products:
-                # verificar se pode mover para a direita
-                if state.can_move_right():
-                    # mover para a direita
-                    state.column_forklift += 1
-                # verificar se pode mover para a esquerda
-                elif state.can_move_left():
-                    # mover para a esquerda
-                    state.column_forklift -= 1
+            cell_start = Cell(p.cell1.line, p.cell1.column)
+            cell_end = Cell(p.cell2.line, p.cell2.column)
 
-            problem = WarehouseProblemSearch(state, p.cell2)
+            # verificar se cell_start é produto
+            if cell_start in self.agent.products:
+                # verificar se está livre à direita
+                if cell_start.column != state.columns - 1 and state.matrix[cell_start.line][
+                    cell_start.column + 1] == constants.EMPTY:
+                    cell_start.column += 1
+                # verificar se está livre à esquerda
+                elif cell_start.column != 0 and state.matrix[cell_start.line][cell_start.column - 1] == constants.EMPTY:
+                    cell_start.column -= 1
+
+            # verificar se cell_end é produto
+            if cell_end in self.agent.products:
+                # verificar se está livre à direita
+                if cell_end.column != state.columns - 1 and state.matrix[cell_end.line][
+                    cell_end.column + 1] == constants.EMPTY:
+                    cell_end.column += 1
+                # verificar se está livre à esquerda
+                elif cell_end.column != 0 and state.matrix[cell_end.line][cell_end.column - 1] == constants.EMPTY:
+                    cell_end.column -= 1
+
+            state.line_forklift = cell_start.line
+            state.column_forklift = cell_start.column
+            problem = WarehouseProblemSearch(state, cell_end)
             sol = self.agent.solve_problem(problem)
             p.value = sol.cost
+
+            # calcular pair path
+            current_cell = cell_start
+            p.add_cell_to_path(current_cell.line, current_cell.column)
+            for act in sol.actions:
+                if str(act) == "UP":
+                    current_cell.line -= 1
+                if str(act) == "RIGHT":
+                    current_cell.column += 1
+                if str(act) == "DOWN":
+                    current_cell.line += 1
+                if str(act) == "LEFT":
+                    current_cell.column -= 1
+                p.add_cell_to_path(current_cell.line, current_cell.column)
 
         self.gui.text_problem.insert(tk.END, str(self.agent))
 
@@ -690,7 +713,14 @@ class SolutionRunner(threading.Thread):
                 else:
                     self.state.matrix[old_cell[j].line][old_cell[j].column] = constants.FORKLIFT
 
-                # TODO put the catched products in black
+                    # TODO put the catched products in black (rever)
+                    if old_cell[j].column != 0 and self.state.matrix[old_cell[j].line][
+                        old_cell[j].column - 1] == constants.PRODUCT:
+                        self.state.matrix[old_cell[j].line][old_cell[j].column - 1] = constants.PRODUCT_CATCH
+                    if old_cell[j].column != self.state.columns - 1 and self.state.matrix[old_cell[j].line][
+                        old_cell[j].column + 1] == constants.PRODUCT:
+                        self.state.matrix[old_cell[j].line][old_cell[j].column + 1] = constants.PRODUCT_CATCH
+
             self.gui.queue.put((copy.deepcopy(self.state), step, False))
         self.gui.queue.put((None, steps, True))  # Done
 

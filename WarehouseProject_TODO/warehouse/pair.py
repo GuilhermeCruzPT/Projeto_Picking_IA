@@ -1,9 +1,17 @@
+from WarehouseProject_TODO.warehouse.cell import Cell
+
+
 class Pair:
     def __init__(self, cell1, cell2):
         self.cell1 = cell1
         self.cell2 = cell2
         self.value = 0
-        # TODO?
+        # TODO (rever)
+        self.path = []
+
+    # TODO (rever)
+    def add_cell_to_path(self, line, column):
+        self.path.append(Cell(line, column))
 
     def hash(self):
         return str(self.cell1.line) + "_" + str(self.cell1.column) + "_" + str(
